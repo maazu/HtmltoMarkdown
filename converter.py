@@ -2,7 +2,7 @@
 """
 Created on Sat Oct 10 12:42:25 2020
 
-@author:
+@author: Muhammad Maaz
 """
 
 import os 
@@ -34,23 +34,27 @@ def generated_time():
     return geneerated_time
 
 
-
 def ask_file_directory():
+    """
+    opens a file selection 
+    dialog menu returns
+    the path of html dir
+    """
     root = Tk()
     root.withdraw()
     dataSet_file_directory = filedialog.askdirectory()
     return dataSet_file_directory
   
-
-
 def read_html_file(file):
+    '''
+    Reads html and returns
+    the source code of the 
+    html file
+    '''
     HtmlFile = open(file, 'r', encoding='utf-8')
     html_source_code = HtmlFile.read() 
     return html_source_code
 
-
-
-    
 def remove_html_tags(html_source_code):
     """
      Remove head and CSS and scrtipt tags
@@ -59,22 +63,15 @@ def remove_html_tags(html_source_code):
     """
     soup = BeautifulSoup(html_source_code,'html.parser')
     body = soup.findAll("body")
-   
     remove_body = body_regex.sub("", str(body[0]))
     remove_div = div_regex.sub("", remove_body)
     removed_span = span_regex.sub("", remove_div)
-    
-    #remoong empty elements
     removed_a_tags = re.sub(atag_regex, '', removed_span) 
     removed_atag2_regex =  re.sub(atag2_regex, '', removed_a_tags) 
     removed_imgs_tags =re.sub(img_regex, '', removed_atag2_regex)  
- 
     html_body_content = removed_imgs_tags
-    
     return html_body_content
 
-
-    
 def filter_html_body(html_body_content): 
     """
      Filters the html content wrap text 
@@ -84,8 +81,7 @@ def filter_html_body(html_body_content):
     content_data = []
     filtered_list = []
     for data in soup:
-        content_data.append(str(data))
-        
+        content_data.append(str(data))      
     filtered_content = [ele for ele in content_data if ele.strip()] 
     index = 0 
     for element in filtered_content:
@@ -96,13 +92,11 @@ def filter_html_body(html_body_content):
 
 
 def create_uncoverted_directory(dataset_name,timestr):
-   
      cwd = os.getcwd()
      unconverted_directory = str(str(dataset_name) +"_UnconvertedHTML_Generated_On_"+str(timestr))
      unconverted_directory = os.path.join(cwd,unconverted_directory);
      while not os.path.exists(unconverted_directory):
-         os.mkdir(unconverted_directory)
-         
+         os.mkdir(unconverted_directory)   
      return unconverted_directory
     
 def save_unconverted_file(unconverted_file,source_code,html_file_name):
@@ -112,16 +106,14 @@ def save_unconverted_file(unconverted_file,source_code,html_file_name):
      unconverted_file.close()
 
 def open_directory_and_process_html(file_path): 
+   
     timestr = generated_time()
     dataset_name = os.path.basename((file_path))                   
     targetPath = str(str(dataset_name) +"_MDConverted_Generated_On_"+str(timestr))
-    
-    
     attachments = [os.path.abspath(x) for x in glob(file_path +'\\*/')]  
     html_files_path= glob(file_path +'\\*.html')
     html_files = [os.path.basename(x) for x in glob(file_path +'\\*.html')]
     Total_html_files = len(html_files_path)    
-
     failded_conversion = []
     uncoverted_source_codes =[]
     if(Total_html_files == 0):
@@ -133,7 +125,6 @@ def open_directory_and_process_html(file_path):
         print("File Dataset Name: ", dataset_name)
         print("Total Html Files Found In Selected Dataset '"+dataset_name+"' : "+ str(Total_html_files))
         print("Html Files With File Attachment In Selected Dataset '"+dataset_name+"' : "+str(len(attachments)))
-        
         print("Click and Enter 'Y' to continue the conversion process ===> ",end="")
         confirmation =  str(input()).strip()
         if(confirmation == "Y" ):
@@ -180,10 +171,7 @@ def open_directory_and_process_html(file_path):
                     corrupted_file = failded_conversion[file]
                     save_unconverted_file(unconverted_directory,uncoverted_source_codes[file],corrupted_file)
                     print(str(file+1)+". "+corrupted_file)
-                    
-           
-          
-            
+                     
             print("HTML Files has been Converted Sucessfully.\nPlease refer to the following directory to check the converted md\n\nDirectory==>"+targetPath)
             print("Conversion Summary:\n"+"Total HTML Files Converted: "+str(total_converted_files))
             print("Total Unconverted Html Files: "+ str(len(failded_conversion)))
@@ -199,7 +187,6 @@ def open_directory_and_process_html(file_path):
                  print("You did not enter 'q' or 'N', closing the  programme ",end="")
                  print("\nThank you for using the program ! Goodbye")
                  exit
-            
         else:
              print("Confrimation Failed Closing the program !")
              exit
@@ -217,8 +204,6 @@ def main():
     dataset_path = ask_file_directory()
     print("Selected File Path:", dataset_path)
     open_directory_and_process_html(dataset_path) 
-  
-    
-    
+   
 if __name__ == '__main__':
     main()
